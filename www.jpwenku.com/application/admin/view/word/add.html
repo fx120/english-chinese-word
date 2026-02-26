@@ -1,0 +1,40 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label for="c-word" class="control-label col-xs-12 col-sm-2">单词:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-word" data-rule="required" class="form-control" name="row[word]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-phonetic" class="control-label col-xs-12 col-sm-2">音标:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-phonetic" class="form-control" name="row[phonetic]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-part_of_speech" class="control-label col-xs-12 col-sm-2">词性:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-part_of_speech" class="form-control" name="row[part_of_speech]" type="text" value="" placeholder="如: n. / v. / adj.">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-definition" class="control-label col-xs-12 col-sm-2">释义:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-definition" data-rule="required" class="form-control" rows="3" name="row[definition]"></textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-example" class="control-label col-xs-12 col-sm-2">例句:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-example" class="form-control" rows="3" name="row[example]"></textarea>
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

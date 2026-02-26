@@ -1,0 +1,58 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label for="c-name" class="control-label col-xs-12 col-sm-2">词表名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-description" class="control-label col-xs-12 col-sm-2">描述:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-description" class="form-control" rows="3" name="row[description]">{$row.description|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-category" class="control-label col-xs-12 col-sm-2">分类:</label>
+        <div class="col-xs-12 col-sm-8">
+            <select id="c-category" class="form-control selectpicker" name="row[category]">
+                {foreach name="categoryList" item="vo"}
+                <option value="{$key|htmlentities}" {in name="key" value="$row.category"}selected{/in}>{$vo|htmlentities}</option>
+                {/foreach}
+                <option value="__custom__">✏️ 手动输入新分类...</option>
+            </select>
+            <input type="text" id="custom-category" class="form-control" placeholder="输入新的分类名称" style="display:none; margin-top:8px;">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-difficulty_level" class="control-label col-xs-12 col-sm-2">难度级别:</label>
+        <div class="col-xs-12 col-sm-8">
+            <select id="c-difficulty_level" class="form-control selectpicker" name="row[difficulty_level]">
+                <option value="1" {in name="1" value="$row.difficulty_level"}selected{/in}>1 - 最简单</option>
+                <option value="2" {in name="2" value="$row.difficulty_level"}selected{/in}>2 - 简单</option>
+                <option value="3" {in name="3" value="$row.difficulty_level"}selected{/in}>3 - 中等</option>
+                <option value="4" {in name="4" value="$row.difficulty_level"}selected{/in}>4 - 较难</option>
+                <option value="5" {in name="5" value="$row.difficulty_level"}selected{/in}>5 - 最难</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-is_official" class="control-label col-xs-12 col-sm-2">是否官方:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_official]', ['1'=>'官方', '0'=>'自定义'], $row['is_official'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">状态:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>__('Normal'), 'hidden'=>__('Hidden')], $row['status'])}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

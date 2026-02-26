@@ -1,0 +1,47 @@
+name: ai_vocabulary_app
+description: AI背单词应用 - 智能词汇学习应用
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <5.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.1
+  dio: ^5.4.0
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  shared_preferences: ^2.2.2
+  excel: ^4.0.2
+  file_picker: ^8.0.0
+  image_picker: ^1.0.7
+  permission_handler: ^11.1.0
+  jwt_decoder: ^2.0.1
+  intl: ^0.18.1
+  fl_chart: ^0.65.0
+  audioplayers: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  integration_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  macos:
+    generate: true
+    image_path: "New Project.png"
+  image_path: "ai_voa_logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "ai_voa_logo.png"
+
+flutter:
+  uses-material-design: true

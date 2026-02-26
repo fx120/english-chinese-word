@@ -1,0 +1,60 @@
+<style>
+.import-json-form { max-width: 600px; }
+.import-json-form .form-group { margin-bottom: 15px; }
+.import-result { margin-top: 15px; padding: 12px 16px; border-radius: 4px; font-size: 14px; display: none; }
+.import-result.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.import-result.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.json-tips { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: #666; }
+.json-tips code { background: #e9ecef; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+.uploaded-info { margin-top: 8px; font-size: 13px; color: #28a745; display: none; }
+</style>
+
+<div class="panel-body">
+    <div class="json-tips">
+        <strong>支持的JSON格式：</strong><br>
+        每行一个JSON对象，包含 <code>wordRank</code>、<code>headWord</code>、<code>content</code>、<code>bookId</code> 字段。<br>
+        系统会自动提取单词、音标、词性、释义、例句，并按 <code>bookId</code> 分组创建词表。<br>
+        <strong>步骤：</strong>先点击上传按钮将JSON文件上传，上传成功后再点击"开始导入"。
+    </div>
+
+    <form id="import-json-form" class="import-json-form" onsubmit="return false;">
+        <div class="form-group">
+            <label>JSON文件 <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="text" id="c-json-url" class="form-control" name="json_url" placeholder="点击右侧按钮上传JSON文件" readonly>
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-json" class="btn btn-danger faupload" data-input-id="c-json-url" data-mimetype="json,txt" data-multiple="false"><i class="fa fa-upload"></i> 上传文件</button></span>
+                </div>
+            </div>
+            <div id="uploaded-info" class="uploaded-info">
+                <i class="fa fa-check-circle"></i> 文件已上传成功
+            </div>
+        </div>
+        <div class="form-group">
+            <label>词表名称（可选，留空自动根据bookId命名）</label>
+            <input type="text" name="name" class="form-control" placeholder="如：高考必备词汇">
+        </div>
+        <div class="form-group">
+            <label>分类</label>
+            <select id="category-select" name="category" class="form-control">
+                {foreach name="categoryList" item="vo"}
+                <option value="{$key|htmlentities}">{$vo|htmlentities}</option>
+                {/foreach}
+                <option value="">-- 不设置 --</option>
+                <option value="__custom__">✏️ 手动输入新分类...</option>
+            </select>
+            <input type="text" id="custom-category" name="custom_category" class="form-control" placeholder="输入新的分类名称" style="display:none; margin-top:8px;">
+        </div>
+        <div class="form-group">
+            <label>描述（可选）</label>
+            <textarea name="description" class="form-control" rows="2" placeholder="词表描述"></textarea>
+        </div>
+        <div class="form-group" style="text-align: right;">
+            <button type="button" id="btn-do-import" class="btn btn-success" disabled>
+                <i class="fa fa-download"></i> 开始导入
+            </button>
+        </div>
+    </form>
+
+    <div id="import-json-result" class="import-result"></div>
+</div>

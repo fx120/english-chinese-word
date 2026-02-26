@@ -1,0 +1,72 @@
+<style>
+.import-tab { display:inline-block; padding:8px 20px; cursor:pointer; border:1px solid #ddd; border-bottom:none; border-radius:4px 4px 0 0; background:#f5f5f5; margin-right:2px; }
+.import-tab.active { background:#fff; border-bottom:1px solid #fff; font-weight:bold; color:#18bc9c; }
+.import-panel { display:none; border:1px solid #ddd; padding:20px; border-radius:0 4px 4px 4px; }
+.import-panel.active { display:block; }
+.word-list-container { max-height:350px; overflow-y:auto; border:1px solid #eee; border-radius:4px; }
+.word-item { display:flex; align-items:center; padding:6px 12px; border-bottom:1px solid #f5f5f5; font-size:13px; }
+.word-item:hover { background:#f8f9fa; }
+.word-item.exists { opacity:0.5; }
+.word-item .word-text { width:120px; font-weight:bold; }
+.word-item .word-def { flex:1; color:#666; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.word-item .word-status { width:60px; text-align:right; }
+.select-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.import-result { margin-top:12px; padding:10px 14px; border-radius:4px; font-size:13px; display:none; }
+.import-result.success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.import-result.error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+.word-count-info { font-size:12px; color:#999; margin-left:auto; }
+</style>
+
+<div class="panel-body" style="padding:15px">
+    <p style="margin-bottom:15px">
+        <strong>{$row.name|htmlentities}</strong>
+        <span class="label label-default">{$row.category|htmlentities}</span>
+        <span class="text-muted">（已有 {$row.word_count} 个单词）</span>
+    </p>
+
+    <div style="margin-bottom:0">
+        <span class="import-tab active" data-tab="txt">TXT文本匹配导入</span>
+        <span class="import-tab" data-tab="select">从其他词表选择导入</span>
+    </div>
+
+    <!-- TXT文本匹配导入 -->
+    <div class="import-panel active" data-panel="txt">
+        <p class="text-muted" style="margin-bottom:10px; font-size:12px;">每行一个单词，系统将与单词库进行匹配导入。</p>
+        <textarea id="txt-content" class="form-control" rows="10" placeholder="apple&#10;banana&#10;orange&#10;...每行一个单词"></textarea>
+        <div style="margin-top:12px; text-align:right;">
+            <button type="button" class="btn btn-success btn-import-txt"><i class="fa fa-upload"></i> 匹配并导入</button>
+        </div>
+        <div id="txt-result" class="import-result"></div>
+    </div>
+
+    <!-- 从其他词表选择导入 -->
+    <div class="import-panel" data-panel="select">
+        <div class="form-group" style="margin-bottom:12px;">
+            <label>选择源词表：</label>
+            <select id="source-list" class="form-control">
+                <option value="">-- 请选择 --</option>
+                {foreach $lists as $item}
+                <option value="{$item.id}">{$item.name} ({$item.category} · {$item.word_count}词)</option>
+                {/foreach}
+            </select>
+        </div>
+
+        <div id="select-area" style="display:none;">
+            <div class="select-toolbar">
+                <input type="text" id="search-word" class="form-control" placeholder="搜索单词..." style="width:200px;">
+                <button type="button" class="btn btn-xs btn-default btn-select-all">全选可导入</button>
+                <button type="button" class="btn btn-xs btn-default btn-select-none">取消全选</button>
+                <span class="word-count-info">已选 <span id="selected-count">0</span> 个</span>
+            </div>
+            <div class="word-list-container" id="word-list"></div>
+            <div style="margin-top:12px; text-align:right;">
+                <button type="button" class="btn btn-success btn-import-selected"><i class="fa fa-upload"></i> 导入选中单词</button>
+            </div>
+        </div>
+
+        <div id="select-loading" style="display:none; text-align:center; padding:30px; color:#999;">
+            <i class="fa fa-spinner fa-spin"></i> 加载中...
+        </div>
+        <div id="select-result" class="import-result"></div>
+    </div>
+</div>

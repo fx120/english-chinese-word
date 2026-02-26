@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# Kiro
+.kiro/
+
+# Flutter
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/coverage/
+app/.metadata
+
+# Android
+app/android/.gradle/
+app/android/.kotlin/
+app/android/local.properties
+app/android/app/build/
+
+# macOS build
+app/macos/Flutter/ephemeral/
+app/macos/Pods/
+
+# iOS build
+app/ios/Flutter/ephemeral/
+app/ios/Pods/
+
+# PHP
+www.jpwenku.com/vendor/
+www.jpwenku.com/runtime/
+www.jpwenku.com/public/uploads/
+
+# Node modules
+node_modules/
+
+# Large vocabulary JSON data files (root level)
+/高考必备词汇（图片记忆）.json
+/ai_voa_logo.png
+/New Project.png
