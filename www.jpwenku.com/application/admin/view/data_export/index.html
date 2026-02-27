@@ -1,0 +1,77 @@
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>词库数据导出</em>导出词库为SQL种子文件，供其他人安装时导入</div>
+    </div>
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:20px;">
+            <div class="col-sm-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">单词总数</div>
+                    <div class="panel-body text-center" style="font-size:28px;font-weight:bold;">{$stats.word_count}</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-success">
+                    <div class="panel-heading">词表总数</div>
+                    <div class="panel-body text-center" style="font-size:28px;font-weight:bold;">{$stats.list_count}</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">关联记录</div>
+                    <div class="panel-body text-center" style="font-size:28px;font-weight:bold;">{$stats.link_count}</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="export-form" method="POST" action="{:url('data_export/export')}">
+            <div class="form-group">
+                <label>选择要导出的词表：</label>
+                <div style="margin:10px 0;">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="select-all" /> <strong>全选</strong>
+                    </label>
+                </div>
+                <div class="row">
+                    {volist name="lists" id="item"}
+                    <div class="col-sm-4" style="margin-bottom:8px;">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="list-checkbox" value="{$item.id}" />
+                            {$item.name}
+                            <span class="text-muted">({$item.word_count}词, {$item.category})</span>
+                        </label>
+                    </div>
+                    {/volist}
+                </div>
+            </div>
+            <input type="hidden" name="list_ids" id="list-ids" value="" />
+            <input type="hidden" name="export_all" id="export-all" value="0" />
+            <hr/>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-export-selected">
+                <i class="fa fa-download"></i> 导出选中词表
+            </button>
+            <button type="button" class="btn btn-success btn-lg" id="btn-export-all" style="margin-left:10px;">
+                <i class="fa fa-database"></i> 导出全部词库
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+$(function(){
+    $('#select-all').on('change', function(){
+        $('.list-checkbox').prop('checked', $(this).is(':checked'));
+    });
+    $('#btn-export-selected').on('click', function(){
+        var ids = [];
+        $('.list-checkbox:checked').each(function(){ ids.push($(this).val()); });
+        if(ids.length === 0){ Toastr.error('请至少选择一个词表'); return; }
+        $('#list-ids').val(ids.join(','));
+        $('#export-all').val('0');
+        $('#export-form').submit();
+    });
+    $('#btn-export-all').on('click', function(){
+        $('#export-all').val('1');
+        $('#export-form').submit();
+    });
+});
+</script>

@@ -76,9 +76,52 @@
 └── doc/                          # 项目文档
 ```
 
-## 快速开始
+## 部署安装
 
-### 前端
+### 1. 后端部署
+
+```bash
+# 克隆代码
+git clone https://github.com/fx120/english-chinese-word.git
+cd english-chinese-word
+```
+
+后端基于 FastAdmin 框架，需要先完成 FastAdmin 标准安装：
+- PHP >= 7.1，MySQL >= 5.7，Nginx/Apache
+- 将 `www.jpwenku.com/` 目录部署为网站根目录
+- 配置数据库连接：`www.jpwenku.com/application/database.php`
+- 完成 FastAdmin 安装向导
+
+### 2. 导入业务表
+
+```bash
+# 导入业务表结构（9张表：用户、单词、词表、学习进度等）
+mysql -u root -p your_db < www.jpwenku.com/database/install.sql
+```
+
+`install.sql` 包含：
+- 9张业务数据表（fa_word, fa_vocabulary_list 等）
+- 后台菜单（词表管理、OCR配置、词库导出）
+- OCR 系统配置项（百度OCR API密钥，需在后台填写）
+
+### 3. 导入词库数据（可选）
+
+如果需要预置词库，可以导入种子数据：
+
+```bash
+mysql -u root -p your_db < www.jpwenku.com/database/seed_data.sql
+```
+
+种子数据可以通过后台「词库导出」功能生成，选择需要的词表导出为 SQL 文件。
+
+### 4. 配置 OCR（可选）
+
+在后台「常规管理 > 系统配置 > OCR识别」中填入百度 OCR API 密钥。
+或访问「OCR配置」菜单，首次访问会自动初始化配置项。
+
+申请地址：[百度智能云OCR](https://cloud.baidu.com/product/ocr)（免费额度：每月1000次）
+
+### 5. 前端
 
 ```bash
 cd app
@@ -86,13 +129,11 @@ flutter pub get
 flutter run
 ```
 
+需要修改 `app/lib/services/api_client.dart` 中的 `BASE_URL` 为你自己的后端地址。
+
 要求：Flutter SDK >= 3.0.0
 
-### 后端
-
-FastAdmin 标准部署，配置数据库连接后即可运行。OCR 功能需要在后台「常规管理 > 系统配置 > OCR识别」中配置百度 OCR API 密钥。
-
-## 构建
+### 构建发布
 
 ```bash
 # Android APK
