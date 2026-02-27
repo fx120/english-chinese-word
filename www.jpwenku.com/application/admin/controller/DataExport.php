@@ -12,7 +12,7 @@ use think\Db;
  *
  * @icon fa fa-database
  */
-class DataExport extends Backend
+class Dataexport extends Backend
 {
     protected $noNeedRight = ['*'];
 

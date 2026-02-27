@@ -167,7 +167,7 @@ VALUES ('menu', 0, 'ocr/setting', 'OCR配置', 'fa fa-camera', '', 'OCR识别服
 
 -- 词库导出菜单
 INSERT INTO `fa_auth_rule` (`type`, `pid`, `name`, `title`, `icon`, `condition`, `remark`, `ismenu`, `createtime`, `updatetime`, `weigh`, `status`)
-VALUES ('menu', 0, 'data_export/index', '词库导出', 'fa fa-database', '', '导出词库种子数据', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 70, 'normal');
+VALUES ('menu', 0, 'dataexport/index', '词库导出', 'fa fa-database', '', '导出词库种子数据', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 70, 'normal');
 
 -- ============================================
 -- OCR系统配置（fa_config）
