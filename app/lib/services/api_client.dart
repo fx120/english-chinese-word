@@ -328,4 +328,24 @@ class ApiClient {
       'limit': limit,
     });
   }
+  
+  // ==================== OCR接口 ====================
+  
+  /// OCR识别图片中的单词
+  /// POST /api/ocr/recognize
+  /// 
+  /// [imageBase64] 图片base64编码
+  /// 返回: {code: 1, msg: "识别成功", data: {lines: [...], words: [...], words_count: N}}
+  Future<Response> ocrRecognize(String imageBase64) async {
+    // 使用FormData发送大base64数据，避免JSON编码问题
+    final formData = FormData.fromMap({'image': imageBase64});
+    return await _dio.post(
+      '/api/ocr/recognize',
+      data: formData,
+      options: Options(
+        sendTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+      ),
+    );
+  }
 }

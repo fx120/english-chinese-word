@@ -337,12 +337,26 @@ class LocalDatabase {
         
         // 获取单词ID
         final wordMaps = await txn.query('word', 
-            columns: ['id'], 
+            columns: ['id', 'example'], 
             where: 'word = ?', 
             whereArgs: [word.word]);
         
         if (wordMaps.isNotEmpty) {
           final wordId = wordMaps.first['id'] as int;
+          final existingExample = wordMaps.first['example'] as String?;
+          
+          // 补充或更新字段（线上库的音标更准确，直接覆盖）
+          final updates = <String, dynamic>{};
+          if (word.phonetic != null && word.phonetic!.isNotEmpty) {
+            updates['phonetic'] = word.phonetic;
+          }
+          if ((existingExample == null || existingExample.isEmpty) && 
+              word.example != null && word.example!.isNotEmpty) {
+            updates['example'] = word.example;
+          }
+          if (updates.isNotEmpty) {
+            await txn.update('word', updates, where: 'id = ?', whereArgs: [wordId]);
+          }
           
           // 添加到词表
           await txn.insert('vocabulary_list_word', {

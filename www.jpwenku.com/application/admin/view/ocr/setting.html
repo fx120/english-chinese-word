@@ -1,0 +1,81 @@
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>OCR识别配置</em>配置百度OCR API密钥，用于拍照识别纸质词表</div>
+    </div>
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <form id="ocr-config-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2">OCR服务商:</label>
+                        <div class="col-xs-12 col-sm-4">
+                            <select name="row[provider]" class="form-control">
+                                <option value="baidu" {if $config.provider == 'baidu'}selected{/if}>百度OCR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2">App ID:</label>
+                        <div class="col-xs-12 col-sm-6">
+                            <input type="text" name="row[baidu_app_id]" class="form-control" value="{$config.baidu.app_id}" placeholder="请输入百度OCR的App ID" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2">API Key:</label>
+                        <div class="col-xs-12 col-sm-6">
+                            <input type="text" name="row[baidu_api_key]" class="form-control" value="{$config.baidu.api_key}" placeholder="请输入百度OCR的API Key" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2">Secret Key:</label>
+                        <div class="col-xs-12 col-sm-6">
+                            <input type="text" name="row[baidu_secret_key]" class="form-control" value="{$config.baidu.secret_key}" placeholder="请输入百度OCR的Secret Key" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2"></label>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="alert alert-info">
+                                <h4>配置说明</h4>
+                                <p>1. 前往 <a href="https://cloud.baidu.com/product/ocr" target="_blank">百度智能云OCR</a> 创建应用</p>
+                                <p>2. 选择"通用文字识别（高精度版）"服务</p>
+                                <p>3. 将获取到的 App ID、API Key、Secret Key 填入上方</p>
+                                <p>4. 免费额度：每月1000次调用</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group layer-footer">
+                        <label class="control-label col-xs-12 col-sm-2"></label>
+                        <div class="col-xs-12 col-sm-6">
+                            <button type="submit" class="btn btn-primary btn-embossed">{:__('Submit')}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $("#ocr-config-form").on("submit", function(e){
+        e.preventDefault();
+        var that = this;
+        $.ajax({
+            url: location.href,
+            type: "POST",
+            data: $(that).serialize(),
+            dataType: "json",
+            success: function(ret){
+                if(ret.code === 1){
+                    Toastr.success(ret.msg);
+                } else {
+                    Toastr.error(ret.msg);
+                }
+            },
+            error: function(){
+                Toastr.error("网络错误");
+            }
+        });
+    });
+});
+</script>

@@ -757,6 +757,7 @@ class _HomePageState extends State<_HomePage> {
     final partOfSpeech = word['part_of_speech'] ?? '';
     final definition = word['definition'] ?? '';
     final example = word['example'] ?? '';
+    final listNames = word['list_names'] ?? '';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -800,6 +801,19 @@ class _HomePageState extends State<_HomePage> {
                   maxLines: isExpanded ? null : 1,
                   overflow: isExpanded ? null : TextOverflow.ellipsis,
                 ),
+                if (listNames.toString().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.folder_outlined, size: 13, color: Colors.grey.shade400),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(listNames, style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                ],
                 if (isExpanded) ...[
                   const Divider(height: 24),
                   Row(
@@ -818,6 +832,10 @@ class _HomePageState extends State<_HomePage> {
                   if (example.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildDetailLabel('例句', example),
+                  ],
+                  if (listNames.toString().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildDetailLabel('词表', listNames),
                   ],
                 ],
               ],

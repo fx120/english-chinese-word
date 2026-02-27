@@ -343,18 +343,65 @@ class Vocabulary extends Api
         
         // 搜索 word 和 definition 字段
         $where = function($query) use ($keyword) {
-            $query->where('word', 'like', '%' . $keyword . '%')
-                  ->whereOr('definition', 'like', '%' . $keyword . '%');
+            $query->where('w.word', 'like', '%' . $keyword . '%')
+                  ->whereOr('w.definition', 'like', '%' . $keyword . '%');
         };
         
-        $total = Db::name('word')->where($where)->count();
+        // 按单词名去重：取每组中信息最完整的一条（优先有音标和例句的）
+        // 先查去重后的总数
+        $total = Db::name('word')->alias('w')->where($where)
+            ->group('LOWER(w.word)')
+            ->count('DISTINCT LOWER(w.word)');
         
-        $words = Db::name('word')
-            ->where($where)
-            ->field('id,word,phonetic,part_of_speech,definition,example')
-            ->order('word', 'asc')
-            ->page($page, $limit)
-            ->select();
+        // 查去重后的单词（每组取id最小的，通常是最早导入、信息最全的）
+        $subQuery = Db::name('word')->alias('w2')->where($where)
+            ->field('MIN(w2.id) as min_id')
+            ->group('LOWER(w2.word)');
+        
+        // 由于ThinkPHP子查询写法限制，用原生SQL更清晰
+        $offset = ($page - 1) * $limit;
+        $likeKeyword = '%' . addslashes($keyword) . '%';
+        
+        $sql = "SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.definition, w.example
+                FROM fa_word w
+                INNER JOIN (
+                    SELECT MIN(id) as min_id
+                    FROM fa_word
+                    WHERE word LIKE ? OR definition LIKE ?
+                    GROUP BY LOWER(word)
+                ) t ON w.id = t.min_id
+                ORDER BY w.word ASC
+                LIMIT ?, ?";
+        
+        $words = Db::query($sql, [$likeKeyword, $likeKeyword, $offset, $limit]);
+        
+        // 查询每个单词所属的词表名称
+        if (!empty($words)) {
+            $wordNames = array_map(function($w) { return strtolower($w['word']); }, $words);
+            $wordNames = array_values(array_unique($wordNames));
+            
+            // 通过 vocabulary_list_word 关联查出词表名
+            $placeholders = implode(',', array_fill(0, count($wordNames), '?'));
+            $listSql = "SELECT LOWER(w.word) as word_lower, GROUP_CONCAT(DISTINCT vl.name ORDER BY vl.name SEPARATOR '、') as list_names
+                        FROM fa_word w
+                        INNER JOIN fa_vocabulary_list_word vlw ON vlw.word_id = w.id
+                        INNER JOIN fa_vocabulary_list vl ON vl.id = vlw.vocabulary_list_id
+                        WHERE LOWER(w.word) IN ({$placeholders})
+                        GROUP BY LOWER(w.word)";
+            $listRows = Db::query($listSql, $wordNames);
+            
+            $listMap = [];
+            foreach ($listRows as $row) {
+                $listMap[$row['word_lower']] = $row['list_names'];
+            }
+            
+            // 附加词表来源信息
+            foreach ($words as &$w) {
+                $key = strtolower($w['word']);
+                $w['list_names'] = $listMap[$key] ?? '';
+            }
+            unset($w);
+        }
         
         $this->success('success', [
             'total' => $total,

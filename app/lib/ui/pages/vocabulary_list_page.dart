@@ -8,6 +8,7 @@ import '../../models/vocabulary_list.dart';
 import '../../database/local_database.dart';
 import 'vocabulary_detail_page.dart';
 import 'login_page.dart';
+import 'ocr_import_page.dart';
 
 class VocabularyListPage extends StatefulWidget {
   final int initialTab;
@@ -677,8 +678,8 @@ class _VocabularyListPageState extends State<VocabularyListPage> {
                   _buildImportOption(icon: Icons.data_object, title: 'JSON词表', subtitle: '支持网络词表JSON格式，自动提取音标释义', color: Colors.purple,
                     onTap: () { Navigator.pop(context); _importFromJson(); }),
                   const SizedBox(height: 12),
-                  _buildImportOption(icon: Icons.camera_alt, title: 'OCR识别', subtitle: '拍照识别纸质词表（即将推出）', color: Colors.orange,
-                    onTap: () { Navigator.pop(context); _showInfo('OCR识别功能即将推出，敬请期待'); }),
+                  _buildImportOption(icon: Icons.camera_alt, title: 'OCR识别', subtitle: '拍照识别纸质词表', color: Colors.orange,
+                    onTap: () { Navigator.pop(context); _importFromOcr(); }),
                 ],
               ),
             ),
@@ -846,6 +847,18 @@ class _VocabularyListPageState extends State<VocabularyListPage> {
 
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.green, duration: const Duration(seconds: 2)));
+  }
+
+  Future<void> _importFromOcr() async {
+    final result = await Navigator.push<dynamic>(
+      context,
+      MaterialPageRoute(builder: (context) => const OcrImportPage()),
+    );
+    if (result != null && mounted) {
+      await _loadLocalLists();
+      setState(() => _selectedTab = 0);
+      _showSuccess('OCR导入成功');
+    }
   }
 
   void _showError(String message) {

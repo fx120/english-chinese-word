@@ -221,6 +221,7 @@ class _WordSearchPageState extends State<WordSearchPage> {
     final partOfSpeech = word['part_of_speech'] ?? '';
     final definition = word['definition'] ?? '';
     final example = word['example'] ?? '';
+    final listNames = word['list_names'] ?? '';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -289,6 +290,19 @@ class _WordSearchPageState extends State<WordSearchPage> {
                   maxLines: isExpanded ? null : 1,
                   overflow: isExpanded ? null : TextOverflow.ellipsis,
                 ),
+                if (listNames.toString().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.folder_outlined, size: 13, color: Colors.grey.shade400),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(listNames, style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                ],
                 // 展开详情
                 if (isExpanded) ...[
                   const Divider(height: 24),
@@ -309,6 +323,10 @@ class _WordSearchPageState extends State<WordSearchPage> {
                   if (example.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildDetailRow('例句', example),
+                  ],
+                  if (listNames.toString().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildDetailRow('词表', listNames),
                   ],
                 ],
               ],

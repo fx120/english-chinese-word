@@ -428,24 +428,95 @@ class VocabularyManager {
     }
   }
   
-  // ==================== 导入OCR图片（预留接口） ====================
+  // ==================== 导入OCR图片 ====================
   
-  /// 从OCR图片导入单词（预留接口）
+  /// OCR识别图片中的单词
   /// 
-  /// [image] 图片文件
-  /// 返回识别的单词列表
+  /// [imageBase64] 图片base64编码
+  /// 返回识别结果，包含原始文字行和解析出的单词列表
+  Future<OcrResult> recognizeImage(String imageBase64) async {
+    try {
+      final response = await _apiClient.ocrRecognize(imageBase64);
+      final data = response.data['data'];
+      
+      final lines = (data['lines'] as List?)?.cast<String>() ?? [];
+      final wordsData = (data['words'] as List?) ?? [];
+      
+      final words = wordsData.map((w) => OcrWordEntry(
+        word: w['word'] as String,
+        phonetic: w['phonetic'] as String?,
+        partOfSpeech: w['part_of_speech'] as String?,
+        definition: w['definition'] as String,
+        example: w['example'] as String?,
+      )).toList();
+      
+      return OcrResult(
+        lines: lines,
+        words: words,
+        wordsCount: data['words_count'] as int? ?? words.length,
+        linesCount: data['lines_count'] as int? ?? lines.length,
+      );
+    } catch (e) {
+      final errMsg = e.toString();
+      if (errMsg.contains('null') && errMsg.contains('DioException')) {
+        throw Exception('OCR识别失败: 服务器返回异常，请检查后端日志');
+      }
+      throw Exception('OCR识别失败: $errMsg');
+    }
+  }
+  
+  /// 将OCR识别结果导入为词表
   /// 
-  /// 注意：此功能需要集成OCR服务，当前仅为预留接口
-  /// 
-  /// 抛出异常：
-  /// - 功能未实现
-  Future<List<Word>> importFromOCR(File image) async {
-    // TODO: 集成OCR服务
-    // 1. 调用OCR服务识别图片中的文字
-    // 2. 解析识别结果为单词列表
-    // 3. 返回单词列表供用户确认和编辑
-    
-    throw UnimplementedError('OCR导入功能尚未实现，请等待后续版本');
+  /// [words] OCR识别并确认后的单词列表
+  /// [name] 词表名称
+  /// [description] 词表描述（可选）
+  /// [category] 词表分类（可选）
+  Future<VocabularyList> importFromOcrWords(
+    List<OcrWordEntry> words, {
+    required String name,
+    String? description,
+    String? category,
+  }) async {
+    try {
+      if (words.isEmpty) {
+        throw Exception('没有可导入的单词');
+      }
+      
+      final wordList = words.map((e) => Word(
+        id: 0,
+        word: e.word,
+        phonetic: e.phonetic,
+        partOfSpeech: e.partOfSpeech,
+        definition: e.definition,
+        example: e.example,
+        createdAt: DateTime.now(),
+      )).toList();
+      
+      final vocabularyList = VocabularyList(
+        id: 0,
+        serverId: null,
+        name: name,
+        description: description ?? '从OCR拍照导入 (${words.length}词)',
+        category: category ?? 'custom',
+        difficultyLevel: 1,
+        wordCount: wordList.length,
+        isOfficial: false,
+        isCustom: true,
+        createdAt: DateTime.now(),
+        syncStatus: 'pending',
+      );
+      
+      final localListId = await _localDatabase.insertVocabularyList(vocabularyList);
+      await _localDatabase.batchInsertWordsToList(wordList, localListId);
+      
+      final createdList = await _localDatabase.getVocabularyList(localListId);
+      if (createdList == null) {
+        throw Exception('创建词表失败');
+      }
+      return createdList;
+    } catch (e) {
+      throw Exception('导入OCR词表失败: ${e.toString()}');
+    }
   }
   
   // ==================== 获取用户词表 ====================
@@ -763,4 +834,38 @@ class VocabularyManager {
       throw Exception('搜索单词失败: ${e.toString()}');
     }
   }
+}
+
+/// OCR识别结果
+class OcrResult {
+  final List<String> lines;
+  final List<OcrWordEntry> words;
+  final int wordsCount;
+  final int linesCount;
+
+  OcrResult({
+    required this.lines,
+    required this.words,
+    required this.wordsCount,
+    required this.linesCount,
+  });
+}
+
+/// OCR识别的单词条目
+class OcrWordEntry {
+  String word;
+  String? phonetic;
+  String? partOfSpeech;
+  String definition;
+  String? example;
+  bool selected;
+
+  OcrWordEntry({
+    required this.word,
+    this.phonetic,
+    this.partOfSpeech,
+    required this.definition,
+    this.example,
+    this.selected = true,
+  });
 }

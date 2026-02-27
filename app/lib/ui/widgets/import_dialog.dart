@@ -131,9 +131,9 @@ class _ImportDialogState extends State<ImportDialog> {
           _buildMethodOption(
             icon: Icons.camera_alt,
             title: 'OCR拍照',
-            subtitle: '拍照识别纸质词表（即将推出）',
+            subtitle: '拍照识别纸质词表',
             method: ImportMethod.ocr,
-            enabled: false,
+            enabled: true,
           ),
         ],
       ),
@@ -204,6 +204,14 @@ class _ImportDialogState extends State<ImportDialog> {
   
   /// 选择导入方式
   Future<void> _selectMethod(ImportMethod method) async {
+    if (method == ImportMethod.ocr) {
+      // OCR直接关闭对话框，由外部导航到OCR页面
+      if (mounted) {
+        Navigator.of(context).pop('ocr');
+      }
+      return;
+    }
+    
     setState(() {
       _selectedMethod = method;
     });
@@ -417,8 +425,8 @@ class _ImportDialogState extends State<ImportDialog> {
               : _descriptionController.text.trim(),
         );
       } else if (_selectedMethod == ImportMethod.ocr) {
-        // OCR导入（预留）
-        throw UnimplementedError('OCR导入功能尚未实现');
+        // OCR已在_selectMethod中处理，不会走到这里
+        return;
       }
       
       if (result != null) {
